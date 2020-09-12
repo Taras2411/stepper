@@ -2,6 +2,7 @@
 // используется GyverTimers
 
 #include <GyverStepper.h>
+#include <GyverTimers.h>
 #define STEP_ROUND 200 // количество шагов на 1 оборот
 #define SPEED_MAX 1250
 #define SPEED_MIN 0
@@ -17,13 +18,14 @@
 
 
 #define ANGLE 3
+#define TIMER 4
 
 GStepper< STEPPER2WIRE> stepper1(STEP_ROUND, PIN_STEP_1, PIN_DIR_1, PIN_EN_1);
 GStepper< STEPPER2WIRE> stepper2(STEP_ROUND, PIN_STEP_2, PIN_DIR_2, PIN_EN_2);
 // мотор с драйвером ULN2003 подключается по порядку пинов, но крайние нужно поменять местами
 // то есть у меня подключено D2-IN1, D3-IN2, D4-IN3, D5-IN4, но в программе поменял 5 и 2
 
-#include <GyverTimers.h>
+
 
 void setup() {
   pinMode(PIN_EN_1, OUTPUT);
@@ -34,12 +36,12 @@ void setup() {
 
   stepper1.setRunMode(FOLLOW_POS);
   stepper1.setMaxSpeed(1000);
-  stepper1.setAcceleration(0);
+  stepper1.setAcceleration(30000);
 
   // мотор 2 будет делать sweep по проверке tick
   stepper2.setRunMode(FOLLOW_POS);
   stepper2.setMaxSpeed(1000);
-  stepper2.setAcceleration(0);
+  stepper2.setAcceleration(30000);
 
   // настраиваем прерывания с периодом, при котором
   // система сможет обеспечить максимальную скорость мотора.
@@ -62,10 +64,14 @@ ISR(TIMER2_A) {
 
 void loop() {
   moveTank(10, 10, ANGLE, 360);
+//      stepper1.setRunMode(KEEP_SPEED);
+//      stepper2.setRunMode(KEEP_SPEED);
+//      stepper1.setSpeed(60);
+//      stepper2.setSpeed(60);
   //    Serial.println("I finished!!");
   //  stepper1.setMaxSpeed(abs(0));
   //  stepper1.setTargetDeg(360,RELATIVE);
-  delay(100);
+  delay(1000);
 }
 
 void moveTank(float spL, float spR, int mode, float value) {
@@ -118,14 +124,23 @@ void moveTank(float spL, float spR, int mode, float value) {
       break;
 
     case TIMER:
-      int spL_int = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
-      int spR_int = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
-      long microsStart = micros();
-      while ((microsStart + value * 1000) >= micros()) {
-        stepper1.setSpeed(spL_int, smooth);
-        stepper2.setSpeed(spR_int, smooth);
-      }
+      stepper1.setRunMode(KEEP_SPEED);
+      stepper2.setRunMode(KEEP_SPEED);
+      spL = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
+      spR = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
+//      long microsStart = micros();
+      stepper1.setSpeed(spL);
+      stepper2.setSpeed(spR);
+      delay(value*1000);
       stepper1.stop();
       stepper2.stop();
+      while (stepper1.tick() == true || stepper2.tick() == true) {
+        delay(1);
+        Serial.println("Speed:");
+        Serial.print(stepper1.getSpeed());
+        //        Serial.println("CurrentDeg:");
+        //        Serial.print(stepper1.getCurrentDeg());
+      }
+      break;
   }
 }
