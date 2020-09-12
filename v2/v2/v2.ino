@@ -36,7 +36,6 @@ void setup() {
   stepper1.setMaxSpeed(1000);
   stepper1.setAcceleration(0);
 
-
   // мотор 2 будет делать sweep по проверке tick
   stepper2.setRunMode(FOLLOW_POS);
   stepper2.setMaxSpeed(1000);
@@ -70,27 +69,27 @@ void loop() {
 }
 
 void moveTank(float spL, float spR, int mode, float value) {
+  if (spL == 0) {
+    stepper1.setAcceleration(0);
+  } else {
+    stepper1.setAcceleration(ACCELERATION);
+  }
+  if (spR == 0) {
+    stepper2.setAcceleration(0);
+  } else {
+    stepper2.setAcceleration(ACCELERATION);
+  }
   switch (mode) {
     case ANGLE:
 
       int spL_int = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
       int spR_int = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
-      if (spL == 0) {
-        stepper1.setAcceleration(0);
-      }else{
-        stepper1.setAcceleration(ACCELERATION);
-      }
-      if (spR == 0) {
-        stepper2.setAcceleration(0);
-      }else{
-        stepper2.setAcceleration(ACCELERATION);
-      }
       Serial.println("spl= ");
       Serial.print(spL_int);
       Serial.println("spr= ");
       Serial.print(spR_int);
-      stepper1.setMaxSpeed(abs(0));
-      stepper2.setMaxSpeed(abs(0));
+      stepper1.setMaxSpeed(abs(spL_int));
+      stepper2.setMaxSpeed(abs(spR_int));
       stepper1.setRunMode(FOLLOW_POS);
       stepper2.setRunMode(FOLLOW_POS);
       if (spL_int >= 0) {
@@ -117,5 +116,16 @@ void moveTank(float spL, float spR, int mode, float value) {
         //        Serial.print(stepper1.getCurrentDeg());
       }
       break;
+
+    case TIMER:
+      int spL_int = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
+      int spR_int = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
+      long microsStart = micros();
+      while ((microsStart + value * 1000) >= micros()) {
+        stepper1.setSpeed(spL_int, smooth);
+        stepper2.setSpeed(spR_int, smooth);
+      }
+      stepper1.stop();
+      stepper2.stop();
   }
 }
