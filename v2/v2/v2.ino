@@ -8,14 +8,12 @@
 #define SPEED_MIN 0
 #define ACCELERATION 30000
 
-#define PIN_STEP_1 3
-#define PIN_DIR_1 2
-#define PIN_STEP_2 5
-#define PIN_DIR_2 4
-
-#define PIN_EN_2 44
-#define PIN_EN_1 46
-
+#define PIN_STEP_1 8
+#define PIN_DIR_1 10
+#define PIN_STEP_2 31
+#define PIN_DIR_2 26
+#define PIN_EN_2 30
+#define PIN_EN_1 9
 
 #define ANGLE 3
 #define TIMER 4
@@ -87,7 +85,7 @@ void moveTank(float spL, float spR, int mode, float value) {
   }
   switch (mode) {
     case ANGLE:
-
+    {
       int spL_int = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
       int spR_int = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
       Serial.println("spl= ");
@@ -122,9 +120,10 @@ void moveTank(float spL, float spR, int mode, float value) {
         //        Serial.print(stepper1.getCurrentDeg());
       }
       break;
-
+    }
     case TIMER:
-      stepper1.setRunMode(KEEP_SPEED);
+    {
+     stepper1.setRunMode(KEEP_SPEED);
       stepper2.setRunMode(KEEP_SPEED);
       spL = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
       spR = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
@@ -142,5 +141,6 @@ void moveTank(float spL, float spR, int mode, float value) {
         //        Serial.print(stepper1.getCurrentDeg());
       }
       break;
+    }  
   }
 }
