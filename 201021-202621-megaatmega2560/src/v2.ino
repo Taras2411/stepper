@@ -1,6 +1,3 @@
-// пример с тиком по прерыванию таймера
-// используется GyverTimers
-
 #include <GyverStepper.h>
 #include <GyverTimers.h>
 #define STEP_ROUND 200 // количество шагов на 1 оборот
