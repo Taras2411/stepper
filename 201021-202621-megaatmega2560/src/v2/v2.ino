@@ -4,14 +4,14 @@
 #define SPEED_MAX 1250
 #define SPEED_MIN 0
 #define ACCELERATION 30000
-#define DIAMETER 68
+#define DIAMETER 6.8
 
-#define PIN_STEP_1 8
-#define PIN_DIR_1 10
-#define PIN_STEP_2 31
-#define PIN_DIR_2 26
-#define PIN_EN_2 30
-#define PIN_EN_1 9
+#define PIN_STEP_1 11
+#define PIN_DIR_1 12
+#define PIN_STEP_2 3    
+#define PIN_DIR_2 2 
+#define PIN_EN_2 4
+#define PIN_EN_1 10
 
 #define ANGLE 3
 #define TIMER 4
@@ -68,7 +68,7 @@ void loop()
   //    Serial.println("I finished!!");
   //  stepper1.setMaxSpeed(abs(0));
   //  stepper1.setTargetDeg(360,RELATIVE);
-  delay(1000);
+  delay(10000);
 }
 
 void moveTank(float spL, float spR, int mode, float value)
@@ -174,7 +174,6 @@ void moveTank(float spL, float spR, int mode, float value)
           Serial.println(value / (PI * DIAMETER / 360));
                  
         }
-
         if (spR_int >= 0)
         {
           stepper2.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);
