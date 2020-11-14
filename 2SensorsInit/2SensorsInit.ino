@@ -1,41 +1,69 @@
 #include "Adafruit_VL53L0X.h"
 #include <Wire.h>
-#define XSHUT1 3
-#define XSHUT2 4
+#define XSHUT1 5
+#define XSHUT2 6
+#define XSHUT3 7
+
 
 Adafruit_VL53L0X lox = Adafruit_VL53L0X();
 Adafruit_VL53L0X lox2 = Adafruit_VL53L0X();
+//Adafruit_VL53L0X lox3 = Adafruit_VL53L0X();
+//Adafruit_VL53L0X lox4 = Adafruit_VL53L0X();
 
-
-
+bool lox1Out;
+bool lox2Out;
 void setup() {
   // put your setup code here, to run once:
   Wire.begin();
 
-  pinMode(XSHUT1,OUTPUT);
-  pinMode(XSHUT2,OUTPUT);
+  pinMode(XSHUT1, OUTPUT);
+  pinMode(XSHUT2, OUTPUT);
+  pinMode(XSHUT3, OUTPUT);
 
-  digitalWrite(XSHUT1,LOW);
-  digitalWrite(XSHUT2,LOW);
-  delay(10);
 
-  digitalWrite(XSHUT1,HIGH);
-  digitalWrite(XSHUT2,LOW);
-  lox.begin(0x30);  
+  digitalWrite(XSHUT1, LOW);
+  digitalWrite(XSHUT2, LOW);
+  digitalWrite(XSHUT3, LOW);
+  delay(100);
 
-  digitalWrite(XSHUT1,HIGH);
-  digitalWrite(XSHUT2,HIGH);
-  lox2.begin(0x31); 
+  digitalWrite(XSHUT1, LOW);
+  digitalWrite(XSHUT2, HIGH);
+  digitalWrite(XSHUT3, LOW);
+  delay(100);
+  lox1Out = lox.begin(0x30);
+  delay(100);
+  digitalWrite(XSHUT1, HIGH);
+//  digitalWrite(XSHUT2, HIGH);
+  digitalWrite(XSHUT3, LOW);
+  delay(100);
+  lox2Out = lox2.begin(0x31);
+  delay(100);
+  digitalWrite(XSHUT1, HIGH);
+  digitalWrite(XSHUT2, HIGH);
+  digitalWrite(XSHUT3, LOW);
+//      digitalWrite(XSHUT1,LOW);
+//      digitalWrite(XSHUT2,LOW);
+  //  digitalWrite(XSHUT3,HIGH);
+  //  digitalWrite(XSHUT4,LOW);
+  //  lox3.begin(0x32);
+  //
+  //  digitalWrite(XSHUT1,LOW);
+  //  digitalWrite(XSHUT2,LOW);
+  //  digitalWrite(XSHUT3,LOW);
+  //  digitalWrite(XSHUT4,HIGH);
+  //  lox4.begin(0x33);
+
   Serial.begin(9600);
   Serial.println("init complit");
-  
-  
+
+
 }
 
 void loop() {
   byte error, address;
   int nDevices;
-
+Serial.println(lox1Out);
+Serial.println(lox2Out);
   Serial.println("Scanning...");
 
   nDevices = 0;
