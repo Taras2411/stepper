@@ -4,6 +4,7 @@
 #define XSHUT2 4
 #define XSHUT3 5
 #define XSHUT4 6
+#define LED 13
 
 VL53L0X sensor1;
 VL53L0X sensor2;
@@ -18,16 +19,19 @@ VL53L0X sensor4;
 // other than the intended target. It works best in dark
 // conditions.
 
-#define LONG_RANGE
+//#define LONG_RANGE
 
 
-// Uncomment ONE of these two lines to get
+// Uncomment ONE  of these two lines to get
 // - higher speed at the cost of lower accuracy OR
 // - higher accuracy at the cost of lower speed
 
-//#define HIGH_SPEED
+#define HIGH_SPEED
 //#define HIGH_ACCURACY
-
+boolean sensor1_initResult;
+boolean sensor2_initResult;
+boolean sensor3_initResult;
+boolean sensor4_initResult;
 
 void setup()
 {
@@ -41,6 +45,7 @@ void setup()
   pinMode(XSHUT2, OUTPUT);
   pinMode(XSHUT3, OUTPUT);
   pinMode(XSHUT4, OUTPUT);
+  pinMode(LED, OUTPUT);
 
   digitalWrite(XSHUT1, LOW);
   digitalWrite(XSHUT2, LOW);
@@ -52,28 +57,28 @@ void setup()
   digitalWrite(XSHUT2, LOW);
   digitalWrite(XSHUT3, LOW);
   digitalWrite(XSHUT4, LOW);
-  boolean sensor1_initResult = sensor1.init();
+  sensor1_initResult = sensor1.init();
   sensor1.setAddress(0x31);
 
   digitalWrite(XSHUT1, HIGH);
   digitalWrite(XSHUT2, HIGH);
   digitalWrite(XSHUT3, LOW);
   digitalWrite(XSHUT4, LOW);
-  boolean sensor2_initResult = sensor2.init();
+  sensor2_initResult = sensor2.init();
   sensor2.setAddress(0x32);
 
   digitalWrite(XSHUT1, HIGH);
   digitalWrite(XSHUT2, HIGH);
   digitalWrite(XSHUT3, HIGH);
   digitalWrite(XSHUT4, LOW);
-  boolean sensor3_initResult = sensor3.init();
+  sensor3_initResult = sensor3.init();
   sensor3.setAddress(0x33);
 
   digitalWrite(XSHUT1, HIGH);
   digitalWrite(XSHUT2, HIGH);
   digitalWrite(XSHUT3, HIGH);
   digitalWrite(XSHUT4, HIGH);
-  boolean sensor4_initResult = sensor4.init();
+  sensor4_initResult = sensor4.init();
   sensor4.setAddress(0x34);
 
   Serial.begin(9600);
@@ -98,10 +103,14 @@ void setup()
   sensor3.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
   sensor4.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);
   sensor4.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
+  sensor1.setMeasurementTimingBudget(200000);
+  sensor2.setMeasurementTimingBudget(200000);
+  sensor3.setMeasurementTimingBudget(200000);
+  sensor4.setMeasurementTimingBudget(200000);
 #endif
 
 #if defined HIGH_SPEED
-  // reduce timing budget to 20 ms (default is about 33 ms)
+  // reduce timing budget to0 20 ms (default is about 33 ms)
   sensor1.setMeasurementTimingBudget(20000);
   sensor2.setMeasurementTimingBudget(20000);
   sensor3.setMeasurementTimingBudget(20000);
@@ -114,33 +123,57 @@ void setup()
   sensor4.setMeasurementTimingBudget(200000);
 #endif
 }
-
+byte sensor1Trys = 2;
+byte sensor2Trys = 2;
+byte sensor3Trys = 2;
+byte sensor4Trys = 2;
 void loop()
 {
-  Serial.println(F("Measured distance:"));
-  Serial.print(F("Sensor1: "));
-  Serial.print(sensor1.readRangeSingleMillimeters());
-  if (sensor1.timeoutOccurred()) {
-    Serial.print(F(" TIMEOUT"));
+  sensorsRead();
+  if (sensor1.readRangeSingleMillimeters()-90 < 150) {
+    digitalWrite(LED, HIGH);
+  } else {
+    digitalWrite(LED, LOW);
   }
-  Serial.println();
-  Serial.print(F("Sensor2: "));
-  Serial.print(sensor2.readRangeSingleMillimeters());
-  if (sensor2.timeoutOccurred()) {
-    Serial.print(F(" TIMEOUT"));
+
+}
+void sensorsRead() {
+  if (sensor1_initResult && sensor1Trys>0) {
+    Serial.print(F("Measured distance: "));
+    Serial.print(F("Sensor1: "));
+    Serial.print(sensor1.readRangeSingleMillimeters());
+    if (sensor1.timeoutOccurred()) {
+      Serial.print(F(" TIMEOUT"));
+      sensor1Trys--;
+    }
   }
-  Serial.println();
-  Serial.print(F("Sensor3: "));
-  Serial.print(sensor3.readRangeSingleMillimeters());
-  if (sensor3.timeoutOccurred()) {
-    Serial.print(F(" TIMEOUT"));
+  if (sensor2_initResult && sensor2Trys>0) {
+    Serial.print(F(" Sensor2: "));
+    Serial.print(sensor2.readRangeSingleMillimeters());
+    if (sensor2.timeoutOccurred()) {
+      Serial.print(F(" TIMEOUT"));
+      sensor2Trys--;
+    }
   }
-  Serial.println();
-  Serial.print(F("Sensor4: "));
-  Serial.print(sensor4.readRangeSingleMillimeters());
-  if (sensor4.timeoutOccurred()) {
-    Serial.print(F(" TIMEOUT"));
+
+
+  if (sensor3_initResult && sensor3Trys>0) {
+    Serial.print(F(" Sensor3: "));
+    Serial.print(sensor3.readRangeSingleMillimeters());
+    if (sensor3.timeoutOccurred()) {
+      Serial.print(F(" TIMEOUT"));
+      sensor3Trys--;
+    }
   }
-  Serial.println();
+
+
+  if (sensor4_initResult && sensor4Trys>0) {
+    Serial.print(F(" Sensor4: "));
+    Serial.print(sensor4.readRangeSingleMillimeters());
+    if (sensor4.timeoutOccurred()) {
+      Serial.print(F(" TIMEOUT"));
+      sensor4Trys--;
+    }
+  }
   Serial.println();
 }
