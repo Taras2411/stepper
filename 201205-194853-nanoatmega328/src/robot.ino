@@ -7,11 +7,12 @@
 #define DIAMETER 68
 
 #define PIN_STEP_1 3
-#define PIN_DIR_1 2
-#define PIN_STEP_2 11
+#define PIN_DIR_1 2 
+#define PIN_EN_1 4
+#define PIN_STEP_2 11 
 #define PIN_DIR_2 12
 #define PIN_EN_2 10
-#define PIN_EN_1 4
+ 
 
 #define ANGLE 3
 #define TIMER 4
@@ -28,6 +29,8 @@ void setup()
   pinMode(PIN_EN_2, OUTPUT);
   digitalWrite(PIN_EN_1, HIGH);
   digitalWrite(PIN_EN_2, HIGH);
+
+ 
   Serial.begin(9600);
 
   stepper1.setRunMode(FOLLOW_POS);
@@ -38,7 +41,7 @@ void setup()
   stepper2.setRunMode(FOLLOW_POS);
   stepper2.setMaxSpeed(1000);
   stepper2.setAcceleration(30000);
-
+//  stepper2.reverse(true);
   // настраиваем прерывания с периодом, при котором
   // система сможет обеспечить максимальную скорость мотора.
   // Для большей плавности лучше лучше взять период чуть меньше, например в два раза
@@ -60,15 +63,12 @@ ISR(TIMER2_A)
 
 void loop()
 {
-  moveTank(10, 10, LENGTH, 10);
-  //      stepper1.setRunMode(KEEP_SPEED);
-  //      stepper2.setRunMode(KEEP_SPEED);
-  //      stepper1.setSpeed(60);
-  //      stepper2.setSpeed(60);
-  //    Serial.println("I finished!!");
-  //  stepper1.setMaxSpeed(abs(0));
-  //  stepper1.setTargetDeg(360,RELATIVE);
+  moveTank(10, 10, LENGTH, 50);
   delay(1000);
+  moveTank(-10, -10, LENGTH, 50);
+  delay(1000);
+
+
 }
 
 void moveTank(float spL, float spR, int mode, float value)
@@ -169,24 +169,23 @@ void moveTank(float spL, float spR, int mode, float value)
         stepper2.setRunMode(FOLLOW_POS);
         if (spL_int >= 0)
         {
-          stepper1.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);
-          Serial.print("L_POSITIVE: ");
-          Serial.println(value / (PI * DIAMETER / 360));
-                 
+          stepper1.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);       
+        }
+        if (spL_int < 0)
+        {
+          stepper1.setTargetDeg((value / (PI * DIAMETER / 360))*-1, RELATIVE);       
         }
 
         if (spR_int >= 0)
         {
           stepper2.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);
         }
-        if (spL_int < 0)
-        {
-          stepper1.setTargetDeg((value / (PI * DIAMETER / 360)) * -1, RELATIVE);
-        }
         if (spR_int < 0)
         {
           stepper2.setTargetDeg((value / (PI * DIAMETER / 360)) * -1, RELATIVE);
         }
+
+        
         while (stepper1.tick() == true || stepper2.tick() == true)
         {
           delay(1);
