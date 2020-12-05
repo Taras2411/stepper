@@ -6,12 +6,12 @@
 #define ACCELERATION 30000
 #define DIAMETER 68
 
-#define PIN_STEP_1 8
-#define PIN_DIR_1 10
-#define PIN_STEP_2 31
-#define PIN_DIR_2 26
-#define PIN_EN_2 30
-#define PIN_EN_1 9
+#define PIN_STEP_1 3
+#define PIN_DIR_1 2
+#define PIN_STEP_2 11
+#define PIN_DIR_2 12
+#define PIN_EN_2 10
+#define PIN_EN_1 4
 
 #define ANGLE 3
 #define TIMER 4
