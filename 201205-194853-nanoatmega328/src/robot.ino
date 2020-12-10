@@ -3,11 +3,11 @@
 #define STEP_ROUND 200 // количество шагов на 1 оборот
 #define SPEED_MAX 1250
 #define SPEED_MIN 0
-#define ACCELERATION 30000
+#define ACCELERATION 0//30000
 #define DIAMETER 68
 
 #define PIN_STEP_1 3
-#define PIN_DIR_1 2 
+#define PIN_DIR_1 5 
 #define PIN_EN_1 4
 #define PIN_STEP_2 11 
 #define PIN_DIR_2 12
@@ -41,7 +41,7 @@ void setup()
   stepper2.setRunMode(FOLLOW_POS);
   stepper2.setMaxSpeed(1000);
   stepper2.setAcceleration(30000);
-//  stepper2.reverse(true);
+ stepper2.reverse(true);
   // настраиваем прерывания с периодом, при котором
   // система сможет обеспечить максимальную скорость мотора.
   // Для большей плавности лучше лучше взять период чуть меньше, например в два раза
@@ -63,10 +63,28 @@ ISR(TIMER2_A)
 
 void loop()
 {
-  moveTank(10, 10, LENGTH, 50);
-  delay(1000);
-  moveTank(-10, -10, LENGTH, 50);
-  delay(1000);
+  delay(100);
+  moveTank(10, 10, LENGTH, 500);
+  delay(100);
+  moveTank(10, -10, LENGTH, 105.24);
+  delay(100);
+  moveTank(10, 10, LENGTH, 850);
+  delay(100);
+  moveTank(-10, 10, LENGTH, 105.24);
+  delay(100);
+  moveTank(10, 10, LENGTH, 60);
+  delay(100);
+  moveTank(-10, 10, LENGTH, 105.24);
+  delay(100);
+  moveTank(10, 10, LENGTH, 200);
+  delay(100);
+  moveTank(10, -10, LENGTH, 105.24);
+  delay(100);
+  moveTank(10, 10, LENGTH, 800);
+  delay(100);
+  delay(100000);
+  // moveTank(10, 10, LENGTH, 100);
+  // delay(1000);
 
 
 }
