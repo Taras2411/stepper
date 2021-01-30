@@ -18,15 +18,15 @@
 #define ECHO3 7
 #define TRIG4 8
 #define ECHO4 9
-
+#define MAX_DISTANCE 200 // Maximum distance we want to ping for (in centimeters). Maximum sensor distance is rated at 400-500cm.
 
 #include <Wire.h>
 #include <iarduino_I2C_connect.h>   
-#include <iarduino_HC_SR04.h>    
-iarduino_HC_SR04 hcsr1(TRIG, ECHO);
-iarduino_HC_SR04 hcsr2(TRIG2, ECHO2);
-iarduino_HC_SR04 hcsr3(TRIG3, ECHO3);
-iarduino_HC_SR04 hcsr4(TRIG4, ECHO4);
+#include <NewPing.h> 
+NewPing sonar1(TRIG, ECHO, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonar2(TRIG2, ECHO2, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonar3(TRIG3, ECHO3, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
+NewPing sonar4(TRIG4, ECHO4, MAX_DISTANCE); // NewPing setup of pins and maximum distance.
 byte REG_Array[9];
 iarduino_I2C_connect I2C2;   
 void setup()
@@ -41,22 +41,23 @@ void setup()
 void loop()
 {
   long startMil = micros();
-  int hcsr04_1 = hcsr1.distance();
-  int hcsr04_2 = hcsr2.distance();
-  int hcsr04_3 = hcsr3.distance();
-  int hcsr04_4 = hcsr4.distance();
+  int hcsr04_1 = sonar1.ping_cm();
+  int hcsr04_2 = sonar2.ping_cm();
+  int hcsr04_3 = sonar3.ping_cm();
+  int hcsr04_4 = sonar4.ping_cm();
   long stopMil = micros();
   Serial.print("Время опроса датчиков не по шине = ");
   Serial.println((stopMil-startMil));
-
-/*Serial.print("Данные с датчика 1 ПРЯМИКОМ С ДАТЧИКА! = ");
+/*
+Serial.print("Данные с датчика 1 ПРЯМИКОМ С ДАТЧИКА! = ");
 Serial.print(hcsr04_1);
 Serial.print("   Данные с датчика 2 = ");
 Serial.print(hcsr04_2);
 Serial.print("   Данные с датчика 3 = ");
 Serial.print(hcsr04_3);
 Serial.print("   Данные с датчика 4 = ");
-Serial.println(hcsr04_4);*/
+Serial.println(hcsr04_4);
+*/
   REG_Array[0] = 9;
 
   REG_Array[1] = hcsr04_1>>8;
