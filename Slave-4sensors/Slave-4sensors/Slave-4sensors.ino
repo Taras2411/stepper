@@ -1,3 +1,5 @@
+#include <Wire.h>
+
 // left = 0
 //right = 1
 //back = 2
@@ -5,8 +7,7 @@
 
 
 
-//#include <Wire.h>
-//#include <iarduino_I2C_connect.h>
+#include <iarduino_I2C_connect.h>
 
 #define FRONT_VCC 16
 #define FRONT_GND 18
@@ -35,68 +36,71 @@
 #define filter 10
 
 int RAW_ARR[4][filter];
-float FILT_ARR[4];
+int FILT_ARR[4];
 
-
+byte REG_Array[9];
+iarduino_I2C_connect I2C2;
 
 void setup() {
+  Wire.begin(0x01); // join i2c bus (address optional for master)
+  I2C2.begin(REG_Array);
   Serial.begin(115200);
   // put your setup code here, to run once:
-  //  pinMode(FRONT_VCC, OUTPUT);
-  //  pinMode(FRONT_GND, OUTPUT);
-  //  pinMode(LEFT_VCC, OUTPUT);
-  //  pinMode(LEFT_GND, OUTPUT);
-  //  pinMode(RIGHT_VCC, OUTPUT);
-  //  pinMode(RIGHT_GND, OUTPUT);
-  //  pinMode(BACK_VCC, OUTPUT);
-  //  pinMode(BACK_GND, OUTPUT);
-  //
-  //
-  //
-  //
-  //
-  //  pinMode(FRONT_TRIG, OUTPUT);
-  //  pinMode(FRONT_ECHO, INPUT);
-  //  pinMode(LEFT_TRIG, OUTPUT);
-  //  pinMode(LEFT_ECHO, INPUT);
-  //  pinMode(RIGHT_TRIG, OUTPUT);
-  //  pinMode(RIGHT_ECHO, INPUT);
-  //  pinMode(BACK_TRIG, OUTPUT);
-  //  pinMode(BACK_ECHO, INPUT);
+  pinMode(FRONT_VCC, OUTPUT);
+  pinMode(FRONT_GND, OUTPUT);
+  pinMode(LEFT_VCC, OUTPUT);
+  pinMode(LEFT_GND, OUTPUT);
+  pinMode(RIGHT_VCC, OUTPUT);
+  pinMode(RIGHT_GND, OUTPUT);
+  pinMode(BACK_VCC, OUTPUT);
+  pinMode(BACK_GND, OUTPUT);
+
+
+
+
+
+  pinMode(FRONT_TRIG, OUTPUT);
+  pinMode(FRONT_ECHO, INPUT);
+  pinMode(LEFT_TRIG, OUTPUT);
+  pinMode(LEFT_ECHO, INPUT);
+  pinMode(RIGHT_TRIG, OUTPUT);
+  pinMode(RIGHT_ECHO, INPUT);
+  pinMode(BACK_TRIG, OUTPUT);
+  pinMode(BACK_ECHO, INPUT);
 
   Serial.print("Lets start ");
 
-  //  digitalWrite(FRONT_GND, LOW);
-  //  digitalWrite(FRONT_VCC, HIGH);
-  //  digitalWrite(LEFT_GND, LOW);
-  //  digitalWrite(LEFT_VCC, HIGH);
-  //  digitalWrite(RIGHT_GND, LOW);
-  //  digitalWrite(RIGHT_VCC, HIGH);
-  //  digitalWrite(BACK_GND, LOW);
-  //  digitalWrite(BACK_VCC, HIGH);
+  digitalWrite(FRONT_GND, LOW);
+  digitalWrite(FRONT_VCC, HIGH);
+  digitalWrite(LEFT_GND, LOW);
+  digitalWrite(LEFT_VCC, HIGH);
+  digitalWrite(RIGHT_GND, LOW);
+  digitalWrite(RIGHT_VCC, HIGH);
+  digitalWrite(BACK_GND, LOW);
+  digitalWrite(BACK_VCC, HIGH);
   delay(1000);
   for (int i; i < filter ; i++) {
-    int tmp = i;
+    int tmp = int(HcSr04Ping("left"));
     Serial.print("Its sensor valure in string №0: ");
     Serial.println(tmp);
     RAW_ARR[0][i] = tmp;
   }
   for (int i; i < filter ; i++) {
-    int tmp = i;
+    int tmp = int(HcSr04Ping("right"));
     Serial.print("Its sensor valure in string №1: ");
     Serial.println(tmp);
 
     RAW_ARR[1][i] = tmp;
   }
   for (int i; i < filter ; i++) {
-    int tmp = i;
+    int tmp = int(HcSr04Ping("back"));
     Serial.print("Its sensor valure in string №2: ");
     Serial.println(tmp);
 
     RAW_ARR[2][i] = tmp;
   }
   for (int i; i < filter ; i++) {
-    int tmp = i;
+    int tmp = int(HcSr04Ping("front"));
     Serial.print("Its sensor valure in string №3: ");
     Serial.println(tmp);
 
@@ -126,14 +130,14 @@ void setup() {
 
 
 void loop() {
-//  delay(1000);
+  //  delay(1000);
   Serial.println("IM IN LOOP!");
   Serial.println("LOOP LEFT START!");
   //left
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[0][i] = RAW_ARR[0][i - 1];
   }
-  RAW_ARR[0][0] = 3;
+  RAW_ARR[0][0] = int(HcSr04Ping("left"));
 
   Serial.println("LOOP LEFT FINISH!");
   //right
@@ -142,7 +146,7 @@ void loop() {
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[1][i] = RAW_ARR[1][i - 1];
   }
-  RAW_ARR[1][0] = 3;
+  RAW_ARR[1][0] = int(HcSr04Ping("right"));
 
   Serial.println("LOOP RIGHT FINISH!");
   //back
@@ -151,7 +155,7 @@ void loop() {
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[2][i] = RAW_ARR[2][i - 1];
   }
-  RAW_ARR[2][0] = 3;
+  RAW_ARR[2][0] = int(HcSr04Ping("back"));
 
   Serial.println("LOOP BACK FINISH!");
   //front
@@ -160,7 +164,7 @@ void loop() {
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[3][i] = RAW_ARR[3][i - 1];
   }
-  RAW_ARR[3][0] = 3;
+  RAW_ARR[3][0] = int(HcSr04Ping("front"));
 
   Serial.println("LOOP FRONT FINISH!");
   Serial.println("Checking array:");
@@ -194,11 +198,25 @@ void loop() {
   for (int y = 0; y < 4; y++) {
     Serial.print(FILT_ARR[y]);
     Serial.print(' ');
-    
+
   }
 
   Serial.println("LOOP FINISH!");
 
+
+  REG_Array[0] = 9;
+
+  REG_Array[1] = FILT_ARR[0] >> 8;
+  REG_Array[2] = FILT_ARR[0];
+
+  REG_Array[3] = FILT_ARR[1] >> 8;
+  REG_Array[4] = FILT_ARR[1];
+
+  REG_Array[5] = FILT_ARR[2] >> 8;
+  REG_Array[6] = FILT_ARR[2];
+
+  REG_Array[7] = FILT_ARR[3] >> 8;
+  REG_Array[8] = FILT_ARR[3];
 }
 
 float HcSr04Ping(String directionOfSensor)
@@ -214,8 +232,8 @@ float HcSr04Ping(String directionOfSensor)
     digitalWrite(LEFT_TRIG, LOW);
     duration = pulseIn(LEFT_ECHO, HIGH, MAX_DUR);
     distance1 = duration / 58;
-    return 42;
-    //return distance1;
+    //    return 42;
+    return distance1;
   }
 
 
@@ -231,8 +249,8 @@ float HcSr04Ping(String directionOfSensor)
     digitalWrite(RIGHT_TRIG, LOW);
     duration = pulseIn(RIGHT_ECHO, HIGH, MAX_DUR);
     distance1 = duration / 58;
-    return 42;
-    //    return distance1;
+    // return 42;
+    return distance1;
   }
 
 
@@ -247,8 +265,8 @@ float HcSr04Ping(String directionOfSensor)
     digitalWrite(BACK_TRIG, LOW);
     duration = pulseIn(BACK_ECHO, HIGH, MAX_DUR);
     distance1 = duration / 58;
-    return 42;
-    //    return distance1;
+    //    return 42;
+    return distance1;
   }
 
   if (directionOfSensor == "front")
@@ -262,8 +280,9 @@ float HcSr04Ping(String directionOfSensor)
     digitalWrite(FRONT_TRIG, LOW);
     duration = pulseIn(FRONT_ECHO, HIGH, MAX_DUR);
     distance1 = duration / 58;
-    return 42;
-    //    return distance1;
+    //    return 42;
+    return distance1;
   }
+
 
 }
