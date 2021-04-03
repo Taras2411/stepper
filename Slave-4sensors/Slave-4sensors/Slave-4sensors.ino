@@ -81,46 +81,35 @@ void setup() {
   delay(1000);
   for (int i; i < filter ; i++) {
     int tmp = int(HcSr04Ping("left"));
-    Serial.print("Its sensor valure in string №0: ");
-    Serial.println(tmp);
     RAW_ARR[0][i] = tmp;
   }
   for (int i; i < filter ; i++) {
     int tmp = int(HcSr04Ping("right"));
-    Serial.print("Its sensor valure in string №1: ");
-    Serial.println(tmp);
 
     RAW_ARR[1][i] = tmp;
   }
   for (int i; i < filter ; i++) {
     int tmp = int(HcSr04Ping("back"));
-    Serial.print("Its sensor valure in string №2: ");
-    Serial.println(tmp);
 
     RAW_ARR[2][i] = tmp;
   }
   for (int i; i < filter ; i++) {
     int tmp = int(HcSr04Ping("front"));
-    Serial.print("Its sensor valure in string №3: ");
-    Serial.println(tmp);
+
 
     RAW_ARR[3][i] = tmp;
   }
 
 
-  Serial.println("ITS SETUP!");
 
 
   for (int y = 0; y < 4; y++) {
-    Serial.print("Sting №");
-    Serial.print(y);
-    Serial.print(' ');
+
     for (int x = 0; x < filter; x++) {
-      Serial.print(RAW_ARR[y][x]);
-      Serial.print(' ');
+
 
     }
-    Serial.println();
+  
   }
 
 
@@ -139,45 +128,36 @@ void loop() {
   }
   RAW_ARR[0][0] = int(HcSr04Ping("left"));
 
-  Serial.println("LOOP LEFT FINISH!");
+
   //right
 
-  Serial.println("LOOP RIGHT START!");
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[1][i] = RAW_ARR[1][i - 1];
   }
   RAW_ARR[1][0] = int(HcSr04Ping("right"));
 
-  Serial.println("LOOP RIGHT FINISH!");
   //back
 
-  Serial.println("LOOP BACK START!");
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[2][i] = RAW_ARR[2][i - 1];
   }
   RAW_ARR[2][0] = int(HcSr04Ping("back"));
 
-  Serial.println("LOOP BACK FINISH!");
+ 
   //front
 
-  Serial.println("LOOP FRONT START!");
   for (int i = filter - 1; i != 0 ; i--) {
     RAW_ARR[3][i] = RAW_ARR[3][i - 1];
   }
   RAW_ARR[3][0] = int(HcSr04Ping("front"));
 
-  Serial.println("LOOP FRONT FINISH!");
-  Serial.println("Checking array:");
-  for (int y = 0; y < 4; y++) {
-    Serial.print("Sting №");
-    Serial.print(y);
-    Serial.print(' ');
-    for (int x = 0; x < filter; x++) {
-      Serial.print(RAW_ARR[y][x]);
-      Serial.print(' ');
 
+  for (int y = 0; y < 4; y++) {
+
+    for (int x = 0; x < filter; x++) {
+   
     }
-    Serial.println();
+
   }
 
 
@@ -194,14 +174,13 @@ void loop() {
   }
 
 
-  Serial.print("Filter output");
+
   for (int y = 0; y < 4; y++) {
-    Serial.print(FILT_ARR[y]);
-    Serial.print(' ');
+
 
   }
 
-  Serial.println("LOOP FINISH!");
+
 
 
   REG_Array[0] = 9;
