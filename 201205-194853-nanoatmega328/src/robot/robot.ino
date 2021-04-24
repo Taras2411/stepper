@@ -7,12 +7,12 @@
 #define DIAMETER 68
 
 #define PIN_STEP_1 3
-#define PIN_DIR_1 5 
+#define PIN_DIR_1 2
 #define PIN_EN_1 4
-#define PIN_STEP_2 11 
+#define PIN_STEP_2 11
 #define PIN_DIR_2 12
 #define PIN_EN_2 10
- 
+
 
 #define ANGLE 3
 #define TIMER 4
@@ -30,7 +30,7 @@ void setup()
   digitalWrite(PIN_EN_1, HIGH);
   digitalWrite(PIN_EN_2, HIGH);
 
- 
+
   Serial.begin(9600);
 
   stepper1.setRunMode(FOLLOW_POS);
@@ -41,7 +41,7 @@ void setup()
   stepper2.setRunMode(FOLLOW_POS);
   stepper2.setMaxSpeed(1000);
   stepper2.setAcceleration(30000);
- stepper2.reverse(true);
+  stepper2.reverse(true);
   // настраиваем прерывания с периодом, при котором
   // система сможет обеспечить максимальную скорость мотора.
   // Для большей плавности лучше лучше взять период чуть меньше, например в два раза
@@ -63,25 +63,13 @@ ISR(TIMER2_A)
 
 void loop()
 {
-  delay(100);
-  moveTank(10, 10, LENGTH, 500);
-  delay(100);
-  moveTank(10, -10, LENGTH, 105.24);
-  delay(100);
-  moveTank(10, 10, LENGTH, 850);
-  delay(100);
-  moveTank(-10, 10, LENGTH, 105.24);
-  delay(100);
-  moveTank(10, 10, LENGTH, 60);
-  delay(100);
-  moveTank(-10, 10, LENGTH, 105.24);
-  delay(100);
-  moveTank(10, 10, LENGTH, 200);
-  delay(100);
-  moveTank(10, -10, LENGTH, 105.24);
-  delay(100);
-  moveTank(10, 10, LENGTH, 800);
-  delay(100);
+
+
+
+    delay(100);
+    moveTank(10, 10, LENGTH, 500);
+//    delay(1000);
+  // moveTank(10, -10, LENGTH, 105.24);
   delay(100000);
   // moveTank(10, 10, LENGTH, 100);
   // delay(1000);
@@ -113,14 +101,16 @@ void moveTank(float spL, float spR, int mode, float value)
       {
         int spL_int = map(spL, -100, 100, SPEED_MAX * -1, SPEED_MAX);
         int spR_int = map(spR, -100, 100, SPEED_MAX * -1, SPEED_MAX);
-        Serial.println("spl= ");
-        Serial.print(spL_int);
-        Serial.println("spr= ");
-        Serial.print(spR_int);
+        Serial.print("spl= ");
+        Serial.println(spL_int);
+        Serial.print("spr= ");
+        Serial.println(spR_int);
+
         stepper1.setMaxSpeed(abs(spL_int));
         stepper2.setMaxSpeed(abs(spR_int));
         stepper1.setRunMode(FOLLOW_POS);
         stepper2.setRunMode(FOLLOW_POS);
+
         if (spL_int >= 0)
         {
           Serial.println("spl>=0 ");
@@ -185,13 +175,16 @@ void moveTank(float spL, float spR, int mode, float value)
         stepper2.setMaxSpeed(abs(spR_int));
         stepper1.setRunMode(FOLLOW_POS);
         stepper2.setRunMode(FOLLOW_POS);
+        Serial.println("I'm near IF!");
         if (spL_int >= 0)
         {
-          stepper1.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);       
+
+          stepper1.setTargetDeg(value / (PI * DIAMETER / 360), RELATIVE);
         }
         if (spL_int < 0)
         {
-          stepper1.setTargetDeg((value / (PI * DIAMETER / 360))*-1, RELATIVE);       
+          stepper1.setTargetDeg((value / (PI * DIAMETER / 360)) * -1, RELATIVE);
+          Serial.println("spl<=0 ");
         }
 
         if (spR_int >= 0)
@@ -203,12 +196,12 @@ void moveTank(float spL, float spR, int mode, float value)
           stepper2.setTargetDeg((value / (PI * DIAMETER / 360)) * -1, RELATIVE);
         }
 
-        
+
         while (stepper1.tick() == true || stepper2.tick() == true)
         {
           delay(1);
-          Serial.println("Speed:");
-          Serial.print(stepper1.getSpeed());
+          //        Serial.println("Speed:");
+          //      Serial.print(stepper1.getSpeed());
           //        Serial.println("CurrentDeg:");
           //        Serial.print(stepper1.getCurrentDeg());
         }
