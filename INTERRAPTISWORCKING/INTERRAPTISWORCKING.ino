@@ -8,9 +8,9 @@
 #define PIN_DIR_1 2
 #define PIN_EN_1 4
 
-//#define PIN_STEP_1 11
-//#define PIN_DIR_1 12
-//#define PIN_EN_1 10
+#define PIN_STEP_2 11
+#define PIN_DIR_2 12
+#define PIN_EN_2 10
 
 
 void setup() {
@@ -21,7 +21,11 @@ void setup() {
   digitalWrite(PIN_DIR_1, HIGH);
   digitalWrite(PIN_EN_1, LOW);
 
-
+  pinMode(PIN_DIR_2, OUTPUT);
+  pinMode(PIN_STEP_2, OUTPUT);
+  pinMode(PIN_EN_2, OUTPUT);
+  digitalWrite(PIN_DIR_2, LOW);
+  digitalWrite(PIN_EN_2, LOW);
 
   TCCR1A = 0;
   TCCR1B = 0;
@@ -38,41 +42,80 @@ void setup() {
 ISR(TIMER1_COMPA_vect) {
   ledSwitch();
   motorFuncRight();
+  motorFuncLeft();
 }
-int i = 0;
-int speedInPerc = 0;
+
+
+int iRight = 0;
+int speedInPercRight = 0;
+
+int iLeft = 0;
+int speedInPercLeft = 0;
 
 void loop() {
-
-  delay(1000);
-  speedInPerc += 10 ;
+  //ОТЛАДКА
+  delay(5000);
+  speedInPercRight -= 10 ;
+  speedInPercLeft -= 10 ;
   Serial.print("SpeedIn%: ");
-  Serial.print(speedInPerc);
-  Serial.print(" i: ");
-  Serial.print(i);
+  Serial.print(speedInPercRight);
+  Serial.print(" iRight: ");
+  Serial.print(iRight);
   Serial.print("over:  ");
-  Serial.println((1.0 / (speedInPerc / 100.0))*10);
+  Serial.println((1.0 / (speedInPercRight / 100.0)) * 10);
+  //\ОТЛАДКА
 }
 
 
 
 void motorFuncRight() {
-  int over = (1.0 / (speedInPerc / 100.0))*10;
-  if (i >= over) {
-
-    digitalWrite(PIN_STEP_1, !digitalRead(PIN_STEP_1));
-    i = 0;
-  } else {
-    i++;
+  if (speedInPercRight > 0) {
+    digitalWrite(PIN_DIR_1, HIGH);
   }
-  
+
+  if (speedInPercRight < 0) {
+    digitalWrite(PIN_DIR_1, LOW);
+  }
+
+  if (speedInPercRight != 0) {
+    int over = (1.0 / (abs(speedInPercRight) / 100.0)) * 10;
+    if (iRight >= over) {
+
+
+      digitalWrite(PIN_STEP_1, !digitalRead(PIN_STEP_1));
+      iRight = 0;
+    } else {
+      iRight++;
+    }
+  } else {
+    digitalWrite(PIN_STEP_1, LOW);
+  }
 }
 
 
 
 
+
 void motorFuncLeft() {
-  //  digitalWrite(PIN_STEP_1, !digitalRead(PIN_STEP_1));
+  if (speedInPercLeft > 0) {
+    digitalWrite(PIN_DIR_2, LOW);
+  }
+
+  if (speedInPercLeft < 0) {
+    digitalWrite(PIN_DIR_2, HIGH);
+  }
+
+  if (speedInPercLeft != 0) {
+    int over = (1.0 / (abs(speedInPercLeft) / 100.0)) * 10;
+    if (iLeft >= over ) {
+      digitalWrite(PIN_STEP_2, !digitalRead(PIN_STEP_2));
+      iLeft = 0;
+    } else {
+      iLeft++;
+    }
+  } else {
+    digitalWrite(PIN_STEP_2, LOW);
+  }
 }
 
 void ledSwitch() {
