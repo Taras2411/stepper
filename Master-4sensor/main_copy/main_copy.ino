@@ -4,7 +4,8 @@
 // Объявляем переменные и константы:
 iarduino_I2C_connect I2C2;                            // объявляем переменную для работы c библиотекой iarduino_I2C_connect
 
-
+#define PIN_EN_2 10
+#define PIN_EN_1 4 
 void setup(){
 //Wire.setClock(400000);                              // устанавливаем скорость передачи данных по шине I2C = 400кБит/с
   Wire.begin();                                   // инициируем подключение к шине I2C в качестве ведомого (slave) устройства, с указанием своего адреса на шине.
@@ -13,6 +14,16 @@ void setup(){
 
 unsigned long stopMil = 0;
 void loop(){
+
+pinMode(PIN_EN_1,OUTPUT);
+pinMode(PIN_EN_2,OUTPUT);
+
+
+digitalWrite(PIN_EN_1, HIGH);
+digitalWrite(PIN_EN_2, HIGH);
+
+
+  
 unsigned long startMil = millis();
 int var = I2C2.readByte(0x01,0);
 long hcsr04_arr[var];
@@ -30,7 +41,7 @@ hcsr04_arr[3]+= I2C2.readByte(0x01,6);
 hcsr04_arr[4]= I2C2.readByte(0x01,7)<<8;
 hcsr04_arr[4]+= I2C2.readByte(0x01,8);
 
-String toOut = "Time of geting data by I2C = " + String(stopMil-startMil) + " Данные с датчика 1 = " + String(hcsr04_arr[1]) + " Данные с датчика 2 = " + String(hcsr04_arr[2])  + " Данные с датчика 3 = " + String(hcsr04_arr[3])  + " Данные с датчика 4 = " + String(hcsr04_arr[4]) ;
+String toOut = " Данные с датчика 1 = " + String(hcsr04_arr[1]) + " Данные с датчика 2 = " + String(hcsr04_arr[2])  + " Данные с датчика 3 = " + String(hcsr04_arr[3])  + " Данные с датчика 4 = " + String(hcsr04_arr[4]) ;
 Serial.println(toOut);
 stopMil = millis();
 

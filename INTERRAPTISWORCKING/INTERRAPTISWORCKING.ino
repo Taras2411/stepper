@@ -1,3 +1,10 @@
+#include <Wire.h>                                     // подключаем библиотеку для работы с шиной I2C
+#include <iarduino_I2C_connect.h>                     // подключаем библиотеку для соединения arduino по шине I2C
+// Объявляем переменные и константы:
+iarduino_I2C_connect I2C2;                            // объявляем переменную для работы c библиотекой iarduino_I2C_connect
+
+
+
 #define STEP_ROUND 200 // количество шагов на 1 оборот
 #define SPEED_MAX 1250
 #define SPEED_MIN 0
@@ -14,7 +21,8 @@
 
 
 void setup() {
-  Serial.begin(9600);
+  Wire.begin();                                   // инициируем подключение к шине I2C в качестве ведомого (slave) устройства, с указанием своего адреса на шине.
+  Serial.begin(115200);
   pinMode(PIN_DIR_1, OUTPUT);
   pinMode(PIN_STEP_1, OUTPUT);
   pinMode(PIN_EN_1, OUTPUT);
@@ -54,15 +62,38 @@ int speedInPercLeft = 0;
 
 void loop() {
   //ОТЛАДКА
-  delay(5000);
-  speedInPercRight -= 10 ;
-  speedInPercLeft -= 10 ;
-  Serial.print("SpeedIn%: ");
-  Serial.print(speedInPercRight);
-  Serial.print(" iRight: ");
-  Serial.print(iRight);
-  Serial.print("over:  ");
-  Serial.println((1.0 / (speedInPercRight / 100.0)) * 10);
+  //  delay(5000);
+  speedInPercRight = -28 ;
+  speedInPercLeft  = 73;
+
+  int var = I2C2.readByte(0x01, 0);
+  long hcsr04_arr[var];
+  hcsr04_arr[0] = I2C2.readByte(0x01, 0);
+
+  hcsr04_arr[1] = I2C2.readByte(0x01, 1) << 8;
+  hcsr04_arr[1] += I2C2.readByte(0x01, 2);
+
+  hcsr04_arr[2] = I2C2.readByte(0x01, 3) << 8;
+  hcsr04_arr[2] += I2C2.readByte(0x01, 4);
+
+  hcsr04_arr[3] = I2C2.readByte(0x01, 5) << 8;
+  hcsr04_arr[3] += I2C2.readByte(0x01, 6);
+
+  hcsr04_arr[4] = I2C2.readByte(0x01, 7) << 8;
+  hcsr04_arr[4] += I2C2.readByte(0x01, 8);
+
+  String toOut = " Данные с датчика 1 = " + String(hcsr04_arr[1]) + " Данные с датчика 2 = " + String(hcsr04_arr[2])  + " Данные с датчика 3 = " + String(hcsr04_arr[3])  + " Данные с датчика 4 = " + String(hcsr04_arr[4]) ;
+  Serial.println(toOut);
+
+
+
+
+  //  Serial.print("SpeedIn%: ");
+  //  Serial.print(speedInPercRight);
+  //  Serial.print(" iRight: ");
+  //  Serial.print(iRight);
+  //  Serial.print("over:  ");
+  //  Serial.println((1.0 / (speedInPercRight / 100.0)) * 10);
   //\ОТЛАДКА
 }
 
